@@ -1,0 +1,62 @@
+;
+; Driver-To-Upload.inf
+;
+
+[Version]
+Signature   = "$WINDOWS NT$"
+Class       = System ; TODO: specify appropriate Class
+ClassGuid   = {4d36e97d-e325-11ce-bfc1-08002be10318} ; TODO: specify appropriate ClassGuid
+Provider    = %ManufacturerName%
+CatalogFile = Driver-To-Upload.cat
+DriverVer   = ; TODO: set DriverVer in stampinf property pages
+PnpLockdown = 1
+
+[DestinationDirs]
+DefaultDestDir = 13
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+Driver-To-Upload.sys = 1,,
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName% = Standard,NT$ARCH$.10.0...16299 ; %13% support introduced in build 16299
+
+[Standard.NT$ARCH$.10.0...16299]
+%Driver-To-Upload.DeviceDesc% = Driver-To-Upload_Device, Root\Driver-To-Upload ; TODO: edit hw-id
+
+[Driver-To-Upload_Device.NT]
+CopyFiles = File_Copy
+
+[File_Copy]
+Driver-To-Upload.sys
+
+;-------------- Service installation
+[Driver-To-Upload_Device.NT.Services]
+AddService = Driver-To-Upload,%SPSVCINST_ASSOCSERVICE%, Driver-To-Upload_Service_Inst
+
+; -------------- Driver-To-Upload driver install sections
+[Driver-To-Upload_Service_Inst]
+DisplayName    = %Driver-To-Upload.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %13%\Driver-To-Upload.sys
+
+[Driver-To-Upload_Device.NT.Wdf]
+KmdfService = Driver-To-Upload, Driver-To-Upload_wdfsect
+
+[Driver-To-Upload_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+[Strings]
+SPSVCINST_ASSOCSERVICE = 0x00000002
+ManufacturerName = "<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+DiskName = "Driver-To-Upload Installation Disk"
+Driver-To-Upload.DeviceDesc = "Driver-To-Upload Device"
+Driver-To-Upload.SVCDESC = "Driver-To-Upload Service"
